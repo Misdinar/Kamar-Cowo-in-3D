@@ -3,15 +3,12 @@
   <head>
     <title>FP KAMAR COWO in 3D</title>
   </head>
-  <body></body>
+  <body style="background-color: black"></body>
 </html>
-
 <script type="module">
   import * as THREE from "https://threejsfundamentals.org/threejs/resources/threejs/r132/build/three.module.js";
   import { OrbitControls } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/controls/OrbitControls.js";
   import { GLTFLoader } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js";
-  import { Reflector } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/objects/Reflector.js";
-  import * as dat from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/libs/dat.gui.module.js";
 
   let scene,
     camera,
@@ -21,43 +18,16 @@
     texture,
     light,
     light1,
+    light2,
     cube,
-    lightHelper,
+    lightHelper1,
+    lightHelper2,
     plane,
     geometry,
     material;
   let sphere_dalam, controls, root;
-  // const gui = new dat.GUI();
   let ADD = 0.001,
     theta = 0;
-
-  //     class FogGUIHelper {
-  //     constructor(fog, backgroundColor) {
-  //         this.fog = fog;
-  //         this.backgroundColor = backgroundColor;
-  //     }
-  //     get near() {
-  //         return this.fog.near;
-  //     }
-  //     set near(v) {
-  //         this.fog.near = v;
-  //         this.fog.far = Math.max(this.fog.far, v);
-  //      }
-  //     get far() {
-  //         return this.fog.far;
-  //     }
-  //     set far(v) {
-  //         this.fog.far = v;
-  //         this.fog.near = Math.min(this.fog.near, v);
-  //     }
-  //     get color() {
-  //         return `#${this.fog.color.getHexString()}`;
-  //     }
-  //     set color(hexString) {
-  //         this.fog.color.set(hexString);
-  //         this.backgroundColor.set(hexString);
-  //     }
-  // }
 
   let onMouseClick = function (e) {
     ADD *= -1;
@@ -67,41 +37,8 @@
 
   //membuat panorama view
   let createGeometry = function () {
-    // texture = new THREE.TextureLoader().load('spiaggia_di_mondello.jpg');
-
-    // let material = new THREE.MeshBasicMaterial({map : texture, side: THREE.DoubleSide});
-    // let geometry = new THREE.SphereGeometry(20, 100, 100);
-    // shepre = new THREE.Mesh(geometry, material);
-    // scene.add(shepre)
-
-    // texture = new THREE.TextureLoader().load('stone.jpg');
-    // geometry = new THREE.SphereGeometry(8, 5, 5);
-    // material = new THREE.MeshPhongMaterial({ color: 0xffffff });
-    // sphere_dalam = new THREE.Mesh(geometry, material);
-    // sphere_dalam.receiveShadow = true;
-    // sphere_dalam.castShadow = true;
-    // scene.add(sphere_dalam);
-
-    // const gltfLoader = new GLTFLoader();
-    // const url = 'scene.gltf';
-    // gltfLoader.load(url, (gltf) => {
-    // gltf.scene.scale.set(0.2, 0.2, 0.2);
-    // root = gltf.scene;
-    // root.position.set(-0.55, 5, -5);
-    // scene.add(root);
-
-    // //buat shadow dari objectnya
-    // root.traverse((obj) => {
-
-    // if (obj.castShadow !== undefined) {
-    //   obj.castShadow = true;
-    //   obj.receiveShadow = true;
-    // }
-    // });
-    // });
-
     const gltfLoader1 = new GLTFLoader();
-    const url1 = "kamar.gltf";
+    const url1 = "blender/kamar22.gltf";
     gltfLoader1.load(url1, (gltf) => {
       gltf.scene.scale.set(0.1, 0.1, 0.1);
       sphere_dalam = gltf.scene;
@@ -116,28 +53,6 @@
         }
       });
     });
-
-    // texture = new THREE.TextureLoader().load( 'stone1.jpg');
-    // geometry = new THREE.BoxGeometry(10, 0.2, 10);
-    // material = new THREE.MeshPhongMaterial({color: 0X697159, map: texture,
-    //                             side: THREE.DoubleSide});
-    // plane = new THREE.Mesh(geometry, material);
-    // plane.position.y = -1.5;
-    // plane.receiveShadow = true;
-    // scene.add(plane);
-
-    // let planeMirror = new THREE.PlaneGeometry( 10, 5 );
-    // let kaca = new Reflector( planeMirror, {
-    //         clipBias: 0.02,
-    //         textureWidth: window.innerWidth * window.devicePixelRatio,
-    //         textureHeight: window.innerHeight * window.devicePixelRatio,
-    //         color: 0x889999
-    //     } );
-    // kaca.position.y = 1;
-    // kaca.position.z = -5;
-    // // kaca.castShadow = true;
-    // // kaca.receiveShadow = true;
-    // scene.add(kaca);
   };
   // set up the environment -
   // initiallize scene, camera, objects and renderer
@@ -145,19 +60,7 @@
   let init = function () {
     // 1. create the scene
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xffffff);
-
-    //fog
-    // const near = 1;
-    // const far = 100;
-    // const color = "white";
-    // scene.fog = new THREE.Fog(color, 1, 50);
-
-    // fog helper
-    // const fogGUIHelper = new FogGUIHelper(scene.fog, scene.background);
-    // gui.add(fogGUIHelper, "near", near, far).listen();
-    // gui.add(fogGUIHelper, "far", near, far).listen();
-    // gui.addColor(fogGUIHelper, "color"); // 2. create an locate the camera
+    scene.background = new THREE.Color(0x212121);
 
     // const axesHelper = new THREE.AxesHelper(15);
     // scene.add(axesHelper);
@@ -169,29 +72,35 @@
     );
     camera.position.set(-5, 2, -1);
 
-    light = new THREE.AmbientLight(0xffffff, 0.5);
-    // light.castShadow = true;
-    // light.shadow.radius = 3;
+    light = new THREE.AmbientLightProbe(0xffffff, 1); // ceritanya lampu putih atas
     scene.add(light);
 
-    light1 = new THREE.DirectionalLight(0xffffff, 1.5);
-    light1.position.set(-2.85, 8.6, -1);
+    light1 = new THREE.DirectionalLight(0x2d46b9, 1); // ceritanya lampu biru kanan
+    light1.position.set(-3.85, 2, 0);
 
+    light2 = new THREE.DirectionalLight(0xf037a5, 1); // ceritanya lampu ungu kanan
+    light2.position.set(0, 2, -4);
     //shadow
     light1.castShadow = true;
-    light1.shadow.radius = 5;
+    light1.shadow.radius = 2;
     scene.add(light1);
 
+    light2.castShadow = true;
+    light2.shadow.radius = 1;
+    scene.add(light2);
     // 3. create an locate the object on the scene
 
-    // lightHelper = new THREE.DirectionalLightHelper(light1, 1, 0x000000);
-    // scene.add(lightHelper);
+    lightHelper1 = new THREE.DirectionalLightHelper(light1, 1, 0x000000);
+    scene.add(lightHelper1);
 
+    lightHelper2 = new THREE.DirectionalLightHelper(light2, 1, 0x000000);
+    scene.add(lightHelper2);
     createGeometry(); // 4. create the renderer
     renderer = new THREE.WebGLRenderer({ antialiasing: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.shadowMap.type = THREE.VSMShadowMap; //jenis bayangan yng dipakai
+    renderer.receiveShadow = true;
 
     document.body.appendChild(renderer.domElement);
     document.addEventListener("click", onMouseClick, false);
@@ -204,11 +113,6 @@
     controls.dampingFactor = 0.05;
   }; // main animation loop - calls 50-60 in a second.
   let mainLoop = function () {
-    // sphere_dalam.rotation.y += ADD;
-    // if (sphere_dalam.rotation.y >= 1 || sphere_dalam.rotation.y <= -1)
-    // ADD *= -1;
-    // console.log(sphere_dalam.rotation.y, ADD);
-    // lightHelper.update();
     renderer.render(scene, camera);
     controls.update();
     requestAnimationFrame(mainLoop);
