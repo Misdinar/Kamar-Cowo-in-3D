@@ -29,24 +29,18 @@
   let ADD = 0.001,
     theta = 0;
 
-  let onMouseClick = function (e) {
-    ADD *= -1;
-    let x = e.ClientX;
-    let y = e.ClientY;
-  };
-
-  //membuat panorama view
+  //memuat gltf kamar
   let createGeometry = function () {
     const gltfLoader1 = new GLTFLoader();
     const url1 = "blender/kamar22.gltf";
     gltfLoader1.load(url1, (gltf) => {
       gltf.scene.scale.set(0.1, 0.1, 0.1);
-      sphere_dalam = gltf.scene;
-      sphere_dalam.position.set(0, 0, 0);
-      scene.add(sphere_dalam);
+      root = gltf.scene;
+      root.position.set(0, 0, 0);
+      scene.add(root);
 
       //buat shadow dari objectnya
-      sphere_dalam.traverse((obj) => {
+      root.traverse((obj) => {
         if (obj.castShadow !== undefined) {
           obj.castShadow = true;
           obj.receiveShadow = true;
@@ -54,6 +48,7 @@
       });
     });
   };
+
   // set up the environment -
   // initiallize scene, camera, objects and renderer
 
@@ -64,13 +59,14 @@
 
     // const axesHelper = new THREE.AxesHelper(15);
     // scene.add(axesHelper);
+
     camera = new THREE.PerspectiveCamera(
       60,
       window.innerWidth / window.innerHeight,
       1,
       1000
     );
-    camera.position.set(-5, 2, -1);
+    camera.position.set(-5, 3, -3);
 
     light = new THREE.AmbientLightProbe(0xffffff, 1); // ceritanya lampu putih atas
     scene.add(light);
@@ -78,7 +74,7 @@
     light1 = new THREE.DirectionalLight(0x2d46b9, 1); // ceritanya lampu biru kanan
     light1.position.set(-3.85, 2, 0);
 
-    light2 = new THREE.DirectionalLight(0xf037a5, 1); // ceritanya lampu ungu kanan
+    light2 = new THREE.DirectionalLight(0xf037a5, 1); // ceritanya lampu violet kanan
     light2.position.set(0, 2, -4);
     //shadow
     light1.castShadow = true;
@@ -90,11 +86,12 @@
     scene.add(light2);
     // 3. create an locate the object on the scene
 
-    lightHelper1 = new THREE.DirectionalLightHelper(light1, 1, 0x000000);
-    scene.add(lightHelper1);
+    // lightHelper1 = new THREE.DirectionalLightHelper(light1, 1, 0x000000);
+    // scene.add(lightHelper1);
 
-    lightHelper2 = new THREE.DirectionalLightHelper(light2, 1, 0x000000);
-    scene.add(lightHelper2);
+    // lightHelper2 = new THREE.DirectionalLightHelper(light2, 1, 0x000000);
+    // scene.add(lightHelper2);
+
     createGeometry(); // 4. create the renderer
     renderer = new THREE.WebGLRenderer({ antialiasing: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -103,7 +100,6 @@
     renderer.receiveShadow = true;
 
     document.body.appendChild(renderer.domElement);
-    document.addEventListener("click", onMouseClick, false);
 
     // controls
     controls = new OrbitControls(camera, renderer.domElement);
