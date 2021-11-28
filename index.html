@@ -19,9 +19,17 @@
     light,
     light1,
     light2,
+    light3,
+    light4,
+    light5,
+    light6,
     cube,
     lightHelper1,
     lightHelper2,
+    lightHelper3,
+    lightHelper4,
+    lightHelper5,
+    lightHelper6,
     plane,
     geometry,
     material;
@@ -32,11 +40,12 @@
   //memuat gltf kamar
   let createGeometry = function () {
     const gltfLoader1 = new GLTFLoader();
-    const url1 = "blender/kamar22.gltf";
+    const url1 = "blender/kamar30.gltf";
     gltfLoader1.load(url1, (gltf) => {
       gltf.scene.scale.set(0.1, 0.1, 0.1);
       root = gltf.scene;
       root.position.set(0, 0, 0);
+      root.encoding = THREE.LinearEncoding;
       scene.add(root);
 
       //buat shadow dari objectnya
@@ -68,22 +77,67 @@
     );
     camera.position.set(-5, 3, -3);
 
-    light = new THREE.AmbientLightProbe(0xffffff, 1); // ceritanya lampu putih atas
+    // scene.add(new THREE.CameraHelper(camera));
+
+    light = new THREE.AmbientLight(0xffffff, 1); // ceritanya lampu putih atas
     scene.add(light);
 
-    light1 = new THREE.DirectionalLight(0x2d46b9, 1); // ceritanya lampu biru kanan
-    light1.position.set(-3.85, 2, 0);
+    // light1 = new THREE.DirectionalLight(0x2d46b9, 1.5); // ceritanya lampu biru kanan
+    // light1.position.set(-3.85, 2, 0);
 
-    light2 = new THREE.DirectionalLight(0xf037a5, 1); // ceritanya lampu violet kanan
-    light2.position.set(0, 2, -4);
+    // light2 = new THREE.DirectionalLight(0xf037a5, 1.5); // ceritanya lampu violet kanan
+    // light2.position.set(0, 2, -4);
+
+    light3 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu biru kanan
+    light3.position.set(0, 2.4, 0);
+
+    // light4 = new THREE.DirectionalLight(0xffffff, 0.5); // ceritanya lampu biru kanan
+    // light4.position.set(5, 10, 0);
+
+    // light5 = new THREE.DirectionalLight(0xffffff, 0.5); // ceritanya lampu biru kanan
+    // light5.position.set(0, 10, -5);
+
+    // light6 = new THREE.DirectionalLight(0xffffff, 0.5); // ceritanya lampu biru kanan
+    // light6.position.set(-5, 10, 0);
+
+    // const spotLight = new THREE.SpotLight(0xffffff);
+    // spotLight.position.set(0, 9, 0);
+
+    // spotLight.castShadow = true;
+
+    // spotLight.shadow.mapSize.width = 50;
+    // spotLight.shadow.mapSize.height = 50;
+
+    // spotLight.shadow.camera.near = 50;
+    // spotLight.shadow.camera.far = 40;
+    // spotLight.shadow.camera.fov = 30;
+
+    // scene.add(spotLight);
+
     //shadow
-    light1.castShadow = true;
-    light1.shadow.radius = 2;
-    scene.add(light1);
+    // light1.castShadow = true;
+    // light1.shadow.radius = 2;
+    // scene.add(light1);
 
-    light2.castShadow = true;
-    light2.shadow.radius = 1;
-    scene.add(light2);
+    // light2.castShadow = true;
+    // light2.shadow.radius = 1;
+    // scene.add(light2);
+
+    light3.castShadow = true;
+    light3.shadow.radius = 5;
+    scene.add(light3);
+
+    // light4.castShadow = true;
+    // light4.shadow.radius = 1;
+    // scene.add(light4);
+
+    // light5.castShadow = true;
+    // light5.shadow.radius = 1;
+    // scene.add(light5);
+
+    // light6.castShadow = true;
+    // light6.shadow.radius = 1;
+    // scene.add(light6);
     // 3. create an locate the object on the scene
 
     // lightHelper1 = new THREE.DirectionalLightHelper(light1, 1, 0x000000);
@@ -92,12 +146,32 @@
     // lightHelper2 = new THREE.DirectionalLightHelper(light2, 1, 0x000000);
     // scene.add(lightHelper2);
 
+    lightHelper3 = new THREE.DirectionalLightHelper(light3, 3, 0x000000);
+    scene.add(lightHelper3);
+
+    // lightHelper4 = new THREE.DirectionalLightHelper(light4, 3, 0x000000);
+    // scene.add(lightHelper4);
+
+    // lightHelper5 = new THREE.DirectionalLightHelper(light5, 3, 0x000000);
+    // scene.add(lightHelper5);
+
+    // lightHelper6 = new THREE.DirectionalLightHelper(light6, 3, 0x000000);
+    // scene.add(lightHelper6);
+
+    // const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+    // scene.add(spotLightHelper);
+
     createGeometry(); // 4. create the renderer
     renderer = new THREE.WebGLRenderer({ antialiasing: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
+    renderer.shadowMapSoft = true;
     renderer.shadowMap.type = THREE.VSMShadowMap; //jenis bayangan yng dipakai
     renderer.receiveShadow = true;
+
+    renderer.physicallyCorrectLights = true;
+    renderer.gammaOutput = true;
+    renderer.gammaFactor = 2.2;
 
     document.body.appendChild(renderer.domElement);
 
