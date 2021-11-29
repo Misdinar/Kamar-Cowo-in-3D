@@ -40,7 +40,7 @@
   //memuat gltf kamar
   let createGeometry = function () {
     const gltfLoader1 = new GLTFLoader();
-    const url1 = "blender/kamar30.gltf";
+    const url1 = "blender/kamar31.gltf";
     gltfLoader1.load(url1, (gltf) => {
       gltf.scene.scale.set(0.1, 0.1, 0.1);
       root = gltf.scene;
@@ -64,7 +64,7 @@
   let init = function () {
     // 1. create the scene
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x212121);
+    scene.background = new THREE.Color(0xfefbf3);
 
     // const axesHelper = new THREE.AxesHelper(15);
     // scene.add(axesHelper);
@@ -79,20 +79,34 @@
 
     // scene.add(new THREE.CameraHelper(camera));
 
-    light = new THREE.AmbientLight(0xffffff, 1); // ceritanya lampu putih atas
-    scene.add(light);
+    // light = new THREE.AmbientLight(0xffffff, 0); // ceritanya cahaya natural
+    // scene.add(light);
 
-    // light1 = new THREE.DirectionalLight(0x2d46b9, 1.5); // ceritanya lampu biru kanan
-    // light1.position.set(-3.85, 2, 0);
+    light1 = new THREE.DirectionalLight(0x230bff, 6); // ceritanya lampu biru kanan
+    light1.position.set(-3.85, 3, 0.23);
+    let t1 = new THREE.Object3D();
+    t1.translateX(0);
+    t1.translateY(0.6);
+    t1.translateZ(0.35);
+    light1.target = t1;
 
-    // light2 = new THREE.DirectionalLight(0xf037a5, 1.5); // ceritanya lampu violet kanan
-    // light2.position.set(0, 2, -4);
+    light2 = new THREE.DirectionalLight(0xc050ff, 6); // ceritanya lampu violet kanan
+    light2.position.set(1, 2.5, -2.5);
 
-    light3 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu biru kanan
-    light3.position.set(0, 2.4, 0);
+    let t2 = new THREE.Object3D();
+    t2.translateX(-0.45);
+    t2.translateY(1.1);
+    t2.translateZ(0.1);
+    light2.target = t2;
 
-    // light4 = new THREE.DirectionalLight(0xffffff, 0.5); // ceritanya lampu biru kanan
-    // light4.position.set(5, 10, 0);
+    light3 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu putih atas
+    light3.position.set(-0.8, 5, 0);
+
+    light4 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu putih pojok kanan kursi
+    light4.position.set(-3.5, 2.5, -3);
+    let t4 = new THREE.Object3D();
+    t4.translateX(0.5);
+    light4.target = t4;
 
     // light5 = new THREE.DirectionalLight(0xffffff, 0.5); // ceritanya lampu biru kanan
     // light5.position.set(0, 10, -5);
@@ -115,21 +129,27 @@
     // scene.add(spotLight);
 
     //shadow
-    // light1.castShadow = true;
-    // light1.shadow.radius = 2;
-    // scene.add(light1);
+    light1.castShadow = true;
+    light1.shadow.radius = 1;
+    light1.target.updateMatrixWorld();
+    scene.add(light1.target);
+    scene.add(light1);
 
-    // light2.castShadow = true;
-    // light2.shadow.radius = 1;
-    // scene.add(light2);
+    light2.castShadow = true;
+    light2.shadow.radius = 1;
+    light2.target.updateMatrixWorld();
+    scene.add(light2.target);
+    scene.add(light2);
 
     light3.castShadow = true;
-    light3.shadow.radius = 5;
+    light3.shadow.radius = 6;
     scene.add(light3);
 
-    // light4.castShadow = true;
-    // light4.shadow.radius = 1;
-    // scene.add(light4);
+    light4.castShadow = true;
+    light4.shadow.radius = 2;
+    light4.target.updateMatrixWorld();
+    scene.add(light4.target);
+    scene.add(light4);
 
     // light5.castShadow = true;
     // light5.shadow.radius = 1;
@@ -140,17 +160,18 @@
     // scene.add(light6);
     // 3. create an locate the object on the scene
 
-    // lightHelper1 = new THREE.DirectionalLightHelper(light1, 1, 0x000000);
-    // scene.add(lightHelper1);
+    lightHelper1 = new THREE.DirectionalLightHelper(light1, 1, 0x000000);
+    scene.add(lightHelper1);
 
-    // lightHelper2 = new THREE.DirectionalLightHelper(light2, 1, 0x000000);
-    // scene.add(lightHelper2);
+    lightHelper2 = new THREE.DirectionalLightHelper(light2, 1, 0x000000);
+    lightHelper2.update();
+    scene.add(lightHelper2);
 
-    lightHelper3 = new THREE.DirectionalLightHelper(light3, 3, 0x000000);
+    lightHelper3 = new THREE.DirectionalLightHelper(light3, 1, 0x000000);
     scene.add(lightHelper3);
 
-    // lightHelper4 = new THREE.DirectionalLightHelper(light4, 3, 0x000000);
-    // scene.add(lightHelper4);
+    lightHelper4 = new THREE.DirectionalLightHelper(light4, 1, 0x000000);
+    scene.add(lightHelper4);
 
     // lightHelper5 = new THREE.DirectionalLightHelper(light5, 3, 0x000000);
     // scene.add(lightHelper5);
@@ -169,6 +190,7 @@
     renderer.shadowMap.type = THREE.VSMShadowMap; //jenis bayangan yng dipakai
     renderer.receiveShadow = true;
 
+    //mencerahkan hasil load gltf
     renderer.physicallyCorrectLights = true;
     renderer.gammaOutput = true;
     renderer.gammaFactor = 2.2;
