@@ -9,6 +9,8 @@
   import * as THREE from "https://threejsfundamentals.org/threejs/resources/threejs/r132/build/three.module.js";
   import { OrbitControls } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/controls/OrbitControls.js";
   import { GLTFLoader } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js";
+  import * as dat from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/libs/dat.gui.module.js";
+
   let scene,
     camera,
     renderer,
@@ -37,6 +39,30 @@
   var clock = new THREE.Clock();
   let ADD = 0.001,
     theta = 0;
+  const gui = new dat.GUI();
+
+    class FogGUIHelper {
+      constructor(light1, light2, light3, light4) {
+          this.light1 = light1;
+          this.light2 = light2;
+          this.light3 = light3;
+          this.light4 = light4;
+      }
+      get color() {
+          return `#${this.light1.color.getHexString()}`;
+      }
+      set color(hexString) {
+          this.light1.color.set(hexString);
+          this.light1.set(hexString);
+      }
+      get color2() {
+          return `#${this.light2.color.getHexString()}`;
+      }
+      set color2(hexString) {
+          this.light2.color2.set(hexString);
+          this.light2.set(hexString);
+      }
+    }
 
   //memuat gltf kamar
   let createGeometry = function () {
@@ -81,6 +107,20 @@
 
     // const axesHelper = new THREE.AxesHelper(15);
     // scene.add(axesHelper);
+
+    //fog
+    // const near = 1;
+    // const far = 100;
+    const color = "white";
+
+    scene.fog = new THREE.Fog(color, 1, 50);
+
+    //fog helper
+    const fogGUIHelper = new FogGUIHelper(light1, light2, light3, light4);
+    // gui.add(fogGUIHelper, "near", near, far).listen();
+    // gui.add(fogGUIHelper, "far", near, far).listen();
+    gui.addColor(fogGUIHelper, "color");
+    gui.addColor(fogGUIHelper, "color2"); // 2. create an locate the camera
 
     camera = new THREE.PerspectiveCamera(
       60,
