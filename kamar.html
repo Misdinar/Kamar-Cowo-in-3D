@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>FP KAMAR COWO in 3D</title>
+  </head>
+  <body style="background-color: rgb(245, 245, 245)">
+  </body>
+</html>
+<script type="module">
+  import * as THREE from "https://threejsfundamentals.org/threejs/resources/threejs/r132/build/three.module.js";
+  import { OrbitControls } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/controls/OrbitControls.js";
+  import { GLTFLoader } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js";
+  import * as dat from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/libs/dat.gui.module.js";
+
+  let scene,
+    camera,
+    renderer,
+    target,
+    texture,
+    light,
+    light1,
+    light2,
+    light3,
+    light4,
+    cube,
+    lightHelper1,
+    lightHelper2,
+    lightHelper3,
+    lightHelper4,
+    plane,
+    geometry,
+    material,
+    controls,
+    root,
+    mixer;
+  root;
+  var clock = new THREE.Clock();
+  let ADD = 0.001,
+    theta = 0,
+    flag_TPP = true;
+
+  // let controls = {};
+  let player = {
+    height: 1.5,
+    turnSpeed: 0.1,
+    speed: 0.1,
+    jumpHeight: 0.2,
+    gravity: 0.01,
+    velocity: 0,
+    playerJumps: false,
+  };
+
+  //memuat gltf kamar
+  let createGeometry = function () {
+    const gltfLoader1 = new GLTFLoader();
+    const url1 = "blender/kamar07.gltf";
+    gltfLoader1.load(url1, (gltf) => {
+      gltf.scene.scale.set(0.1, 0.1, 0.1);
+      root = gltf.scene;
+      mixer = new THREE.AnimationMixer(gltf.scene);
+
+      gltf.animations.forEach((clip) => {
+        mixer.clipAction(clip).play();
+      });
+      root.position.set(0, 0, 0);
+      root.encoding = THREE.LinearEncoding;
+      scene.add(root);
+
+      //buat shadow dari objectnya
+      root.traverse((obj) => {
+        if (obj.castShadow !== undefined) {
+          obj.castShadow = true;
+          obj.receiveShadow = true;
+        }
+      });
+
+      root.loadedModel.animations.forEach((animation) => {
+        let mixer = new AnimationMixer(this.loadedModel.scene);
+        this.mixers.push(mixer);
+        let action = mixer.clipAction(animation);
+        action.play();
+      });
+    });
+  };
+
+  // controlsFPP:Listeners
+  document.addEventListener("keydown", ({ keyCode }) => {
+    controls[keyCode] = true;
+  });
+  document.addEventListener("keyup", ({ keyCode }) => {
+    controls[keyCode] = false;
+  });
+
+  // ...
+  function control() {
+    // controlsFPP:Engine
+    if (controls[87]) {
+      // w
+      camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
+      camera.position.z -= -Math.cos(camera.rotation.y) * player.speed;
+    }
+    if (controls[83]) {
+      // s
+      camera.position.x += Math.sin(camera.rotation.y) * player.speed;
+      camera.position.z += -Math.cos(camera.rotation.y) * player.speed;
+    }
+    if (controls[65]) {
+      // a
+
+      camera.position.x +=
+        Math.sin(camera.rotation.y + Math.PI / 2) * player.speed;
+      camera.position.z +=
+        -Math.cos(camera.rotation.y + Math.PI / 2) * player.speed;
+    }
+    if (controls[68]) {
+      // d
+      camera.position.x +=
+        Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
+      camera.position.z +=
+        -Math.cos(camera.rotation.y - Math.PI / 2) * player.speed;
+    }
+    if (controls[37]) {
+      // la
+      camera.rotation.y -= 0.02;
+    }
+    if (controls[39]) {
+      // ra
+      camera.rotation.y += 0.02;
+    }
+  }
+
+  function ixMovementUpdate() {
+    player.velocity += player.gravity;
+    //camera.position.y -= player.velocity;
+
+    if (camera.position.y < player.height) {
+      camera.position.y = player.height;
+    }
+  }
+
+  // set up the environment -
+  // initiallize scene, camera, objects and renderer
+
+  let init = function () {
+    // 1. create the scene
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xfefbf3);
+
+    // const axesHelper = new THREE.AxesHelper(15);
+    // scene.add(axesHelper);
+
+    var params = {
+      light1: "#230bff",
+      light2: "#c050ff",
+      light3: "#ffffff",
+      light4: "#ffffff",
+      flag_TPP: true,
+    };
+
+    //GUIhelper
+    const gui = new dat.GUI();
+    var folder = gui.addFolder("Light Colour");
+
+    folder
+      .addColor(params, "light1")
+      .name("light kanan")
+      .onChange(function () {
+        light1.color.set(params.light1);
+      });
+    folder
+      .addColor(params, "light2")
+      .name("light belakang")
+      .onChange(function () {
+        light2.color.set(params.light2);
+      });
+    folder
+      .addColor(params, "light3")
+      .name("light atap")
+      .onChange(function () {
+        light3.color.set(params.light3);
+      });
+    folder.open();
+    var kamera = gui.addFolder("Camera Perspective");
+    kamera
+      .add(params, "flag_TPP")
+      .name("TPP")
+      .onChange(function () {
+        if (flag_TPP) flag_TPP = false;
+        else flag_TPP = true;
+      });
+    kamera.open();
+
+    // 2. create an locate the camera
+
+    camera = new THREE.PerspectiveCamera(
+      20,
+      window.innerWidth / window.innerHeight,
+      1,
+      2000
+    );
+
+    // scene.add(new THREE.CameraHelper(camera));
+
+    // light = new THREE.AmbientLight(0xffffff, 0); // ceritanya cahaya natural
+    // scene.add(light);
+
+    light1 = new THREE.DirectionalLight(0x230bff, 6); // ceritanya lampu biru kanan
+    light1.position.set(-3.85, 3, 0.23);
+    let t1 = new THREE.Object3D();
+    t1.translateX(0);
+    t1.translateY(0.6);
+    t1.translateZ(0.35);
+    light1.target = t1;
+
+    light2 = new THREE.DirectionalLight(0xc050ff, 6); // ceritanya lampu violet kanan
+    light2.position.set(1, 2.5, -2.5);
+
+    let t2 = new THREE.Object3D();
+    t2.translateX(-0.45);
+    t2.translateY(1.1);
+    t2.translateZ(0.1);
+    light2.target = t2;
+
+    light3 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu putih atas
+    light3.position.set(-0.8, 5, 0);
+
+    light4 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu putih pojok kanan kursi
+    light4.position.set(-3.5, 2.5, -3);
+    let t4 = new THREE.Object3D();
+    t4.translateX(0.5);
+    light4.target = t4;
+
+    //shadow
+    light1.castShadow = true;
+    light1.shadow.radius = 3;
+    light1.target.updateMatrixWorld();
+    scene.add(light1.target);
+    scene.add(light1);
+
+    light2.castShadow = true;
+    light2.shadow.radius = 3;
+    light2.target.updateMatrixWorld();
+    scene.add(light2.target);
+    scene.add(light2);
+
+    light3.castShadow = true;
+    light3.shadow.radius = 8;
+    scene.add(light3);
+
+    light4.castShadow = true;
+    light4.shadow.radius = 2;
+    light4.target.updateMatrixWorld();
+    scene.add(light4.target);
+    scene.add(light4);
+
+    createGeometry(); // 4. create the renderer
+    renderer = new THREE.WebGLRenderer({ antialiasing: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMapSoft = true;
+    renderer.shadowMap.type = THREE.VSMShadowMap; //jenis bayangan yng dipakai
+    renderer.receiveShadow = true;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    //mencerahkan hasil load gltf
+    renderer.physicallyCorrectLights = true;
+    renderer.gammaOutput = true;
+    renderer.gammaFactor = 2.2;
+
+    document.body.appendChild(renderer.domElement);
+
+    // controls
+    if (flag_TPP) {
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.listenToKeyEvents(window);
+      camera.position.set(-10, player.height + 5, -5);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+    } else {
+      controls.enabled = false;
+      camera.position.set(3, player.height, -5);
+      // camera.lookAt(0, 1, 0);
+    }
+    scene.matrixAutoUpdate = true;
+
+    camera.updateProjectionMatrix();
+  }; // main animation loop - calls 50-60 in a second.
+  let mainLoop = function () {
+    controls.update();
+    if (!flag_TPP) {
+      control();
+      // controls.enabled = false;
+      // ixMovementUpdate();
+    } else {
+      controls.enabled = true;
+      // controls.update();
+    }
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(mainLoop);
+  };
+  function animate() {
+    requestAnimationFrame(animate);
+
+    var delta = clock.getDelta();
+
+    if (mixer) mixer.update(delta);
+
+    renderer.render(scene, camera);
+  }
+
+  init();
+  animate();
+  mainLoop();
+</script>
