@@ -135,7 +135,7 @@ section img#mountains_front {
   color: #ffff;
 }
 
-.sec p {
+.sec p, h3, li {
   font-size: 1em;
   color: #ffff;
 }
