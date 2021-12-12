@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>FP KAMAR COWO in 3D</title>
-  </head>
-  <body style="background-color: rgb(245, 245, 245)"></body>
+
+<head>
+  <title>FP KAMAR COWO in 3D</title>
+</head>
+
+<body style="background-color: rgb(245, 245, 245)"></body>
+
 </html>
 <script type="module">
   import * as THREE from "https://threejsfundamentals.org/threejs/resources/threejs/r132/build/three.module.js";
@@ -135,7 +138,7 @@
 
   function ixMovementUpdate() {
     player.velocity += player.gravity;
-    camera.position.y -= player.velocity;
+    // camera.position.y -= player.velocity;
 
     if (camera.position.y < player.height) {
       camera.position.y = player.height;
