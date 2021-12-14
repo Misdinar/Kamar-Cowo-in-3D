@@ -2,59 +2,55 @@
 <html lang="en">
   <head>
     <title>FP KAMAR COWO in 3D</title>
-    <link rel="shortcut icon" type="image/x-icon" href="https://img.icons8.com/cotton/64/000000/controller--v1.png"/>
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="https://img.icons8.com/cotton/64/000000/controller--v1.png"
+    />
   </head>
-  <body style="background-color: rgb(245, 245, 245)">
-  </body>
+  <body style="background-color: rgb(245, 245, 245)"></body>
 </html>
+
 <script type="module">
   import * as THREE from "https://threejsfundamentals.org/threejs/resources/threejs/r132/build/three.module.js";
   import { OrbitControls } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/controls/OrbitControls.js";
   import { GLTFLoader } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js";
   import * as dat from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/libs/dat.gui.module.js";
+  import { DRACOLoader } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/loaders/DRACOLoader.js";
+  import Stats from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/libs/stats.module.js";
 
   let scene,
     camera,
     renderer,
     target,
-    texture,
     light,
     light1,
     light2,
     light3,
     light4,
+    light5,
+    light6,
+    light7,
     cube,
-    lightHelper1,
-    lightHelper2,
-    lightHelper3,
-    lightHelper4,
-    plane,
+    stats,
+    lightHelper,
     geometry,
-    material,
     controls,
     root,
     mixer;
-  root;
   var clock = new THREE.Clock();
-  let ADD = 0.001,
-    theta = 0,
-    flag_TPP = true;
-
-  // let controls = {};
-  let player = {
-    height: 1.5,
-    turnSpeed: 0.1,
-    speed: 0.1,
-    jumpHeight: 0.2,
-    gravity: 0.01,
-    velocity: 0,
-    playerJumps: false,
-  };
 
   //memuat gltf kamar
   let createGeometry = function () {
     const gltfLoader1 = new GLTFLoader();
-    const url1 = "blender/kamar07.gltf";
+
+    //draco untuk mempercepat loader file GLTF
+    const draco = new DRACOLoader();
+    draco.setDecoderConfig({ type: "js" });
+    draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+    gltfLoader1.setDRACOLoader(draco);
+
+    const url1 = "blender/kamar14.gltf";
     gltfLoader1.load(url1, (gltf) => {
       gltf.scene.scale.set(0.1, 0.1, 0.1);
       root = gltf.scene;
@@ -82,67 +78,17 @@
         action.play();
       });
     });
+    // draco.dispose();
   };
-
-  // controlsFPP:Listeners
-  document.addEventListener("keydown", ({ keyCode }) => {
-    controls[keyCode] = true;
-  });
-  document.addEventListener("keyup", ({ keyCode }) => {
-    controls[keyCode] = false;
-  });
-
-  // ...
-  function control() {
-    // controlsFPP:Engine
-    if (controls[87]) {
-      // w
-      camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
-      camera.position.z -= -Math.cos(camera.rotation.y) * player.speed;
-    }
-    if (controls[83]) {
-      // s
-      camera.position.x += Math.sin(camera.rotation.y) * player.speed;
-      camera.position.z += -Math.cos(camera.rotation.y) * player.speed;
-    }
-    if (controls[65]) {
-      // a
-
-      camera.position.x +=
-        Math.sin(camera.rotation.y + Math.PI / 2) * player.speed;
-      camera.position.z +=
-        -Math.cos(camera.rotation.y + Math.PI / 2) * player.speed;
-    }
-    if (controls[68]) {
-      // d
-      camera.position.x +=
-        Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
-      camera.position.z +=
-        -Math.cos(camera.rotation.y - Math.PI / 2) * player.speed;
-    }
-    if (controls[37]) {
-      // la
-      camera.rotation.y -= 0.02;
-    }
-    if (controls[39]) {
-      // ra
-      camera.rotation.y += 0.02;
-    }
-  }
-
-  function ixMovementUpdate() {
-    player.velocity += player.gravity;
-    //camera.position.y -= player.velocity;
-
-    if (camera.position.y < player.height) {
-      camera.position.y = player.height;
-    }
-  }
 
   // set up the environment -
   // initiallize scene, camera, objects and renderer
 
   let init = function () {
+    stats = new Stats();
+    stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild(stats.domElement);
+
     // 1. create the scene
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xfefbf3);
@@ -154,8 +100,8 @@
       light1: "#230bff",
       light2: "#c050ff",
       light3: "#ffffff",
-      light4: "#ffffff",
-      flag_TPP: true,
+      lightDisplay: "#fefbf3",
+      lightTiang: "#ebd7a0",
     };
 
     //GUIhelper
@@ -180,16 +126,21 @@
       .onChange(function () {
         light3.color.set(params.light3);
       });
-    folder.open();
-    var kamera = gui.addFolder("Camera Perspective");
-    kamera
-      .add(params, "flag_TPP")
-      .name("TPP")
+    folder
+      .addColor(params, "lightTiang")
+      .name("light Tiang")
       .onChange(function () {
-        if (flag_TPP) flag_TPP = false;
-        else flag_TPP = true;
+        light7.color.set(params.lightTiang);
       });
-    kamera.open();
+    folder.open();
+    var display = gui.addFolder("Display");
+    display
+      .addColor(params, "lightDisplay")
+      .name("Background Display")
+      .onChange(function () {
+        scene.background.set(params.lightDisplay);
+      });
+    display.open();
 
     // 2. create an locate the camera
 
@@ -201,9 +152,6 @@
     );
 
     // scene.add(new THREE.CameraHelper(camera));
-
-    // light = new THREE.AmbientLight(0xffffff, 0); // ceritanya cahaya natural
-    // scene.add(light);
 
     light1 = new THREE.DirectionalLight(0x230bff, 6); // ceritanya lampu biru kanan
     light1.position.set(-3.85, 3, 0.23);
@@ -231,6 +179,21 @@
     t4.translateX(0.5);
     light4.target = t4;
 
+    light5 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu putih bawah
+    light5.position.set(0, -2, 0);
+    scene.add(light5);
+
+    light6 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu putih luar jendela
+    light6.position.set(5, 5, 5);
+    scene.add(light6);
+
+    light7 = new THREE.PointLight(0xebd7a0, 5, 0); // ceritanya lampu putih yang tiang dekat sofa
+    const sphere = new THREE.SphereGeometry(0.03, 32, 16);
+    light7.add(
+      new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xebd7a0 }))
+    );
+    light7.position.set(-2.306, 1.1, -2.042);
+
     //shadow
     light1.castShadow = true;
     light1.shadow.radius = 3;
@@ -254,8 +217,15 @@
     scene.add(light4.target);
     scene.add(light4);
 
+    light7.castShadow = true;
+    light7.shadow.radius = 8;
+    scene.add(light7);
+
+    // lightHelper = new THREE.PointLightHelper(light7, 0.1);
+    // scene.add(lightHelper);
+
     createGeometry(); // 4. create the renderer
-    renderer = new THREE.WebGLRenderer({ antialiasing: true });
+    renderer = new THREE.WebGLRenderer({ antialiasing: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMapSoft = true;
@@ -271,36 +241,40 @@
     document.body.appendChild(renderer.domElement);
 
     // controls
-    if (flag_TPP) {
-      controls = new OrbitControls(camera, renderer.domElement);
-      controls.listenToKeyEvents(window);
-      camera.position.set(-10, player.height + 5, -5);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
-    } else {
-      controls.enabled = false;
-      camera.position.set(3, player.height, -5);
-      // camera.lookAt(0, 1, 0);
-    }
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.listenToKeyEvents(window);
+    controls.mouseButtons = {
+      LEFT: THREE.MOUSE.ROTATE,
+      MIDDLE: THREE.MOUSE.DOLLY,
+      RIGHT: THREE.MOUSE.PAN,
+    };
+    camera.position.set(-10, 5, -5);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+
     scene.matrixAutoUpdate = true;
 
     camera.updateProjectionMatrix();
-  }; // main animation loop - calls 50-60 in a second.
-  let mainLoop = function () {
-    controls.update();
-    if (!flag_TPP) {
-      control();
-      // controls.enabled = false;
-      // ixMovementUpdate();
-    } else {
-      controls.enabled = true;
-      // controls.update();
-    }
+  };
 
+  // main animation loop - calls 50-60 in a second.
+  let mainLoop = function () {
+    stats.begin();
+
+    const elapsedTime = clock.getElapsedTime();
+
+    // Update controls
+    controls.update();
+
+    // Render
     renderer.render(scene, camera);
 
+    stats.end();
+    renderer.render(scene, camera);
     requestAnimationFrame(mainLoop);
   };
+
   function animate() {
     requestAnimationFrame(animate);
 
