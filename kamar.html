@@ -85,9 +85,9 @@
   // initiallize scene, camera, objects and renderer
 
   let init = function () {
-    stats = new Stats();
-    stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-    document.body.appendChild(stats.domElement);
+    // stats = new Stats();
+    // stats.showPanel(4); // 0: fps, 1: ms, 2: mb, 3+: custom
+    // document.body.appendChild(stats.domElement);
 
     // 1. create the scene
     scene = new THREE.Scene();
@@ -170,20 +170,20 @@
     t2.translateZ(0.1);
     light2.target = t2;
 
-    light3 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu putih atas
+    light3 = new THREE.DirectionalLight(0xffffff, 0.5); // ceritanya lampu putih atas
     light3.position.set(-0.8, 5, 0);
 
-    light4 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu putih pojok kanan kursi
+    light4 = new THREE.DirectionalLight(0xffffff, 0.5); // ceritanya lampu putih pojok kanan kursi
     light4.position.set(-3.5, 2.5, -3);
     let t4 = new THREE.Object3D();
     t4.translateX(0.5);
     light4.target = t4;
 
-    light5 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu putih bawah
+    light5 = new THREE.DirectionalLight(0xffffff, 0.5); // ceritanya lampu putih bawah
     light5.position.set(0, -2, 0);
     scene.add(light5);
 
-    light6 = new THREE.DirectionalLight(0xffffff, 1); // ceritanya lampu putih luar jendela
+    light6 = new THREE.DirectionalLight(0xffffff, 0.5); // ceritanya lampu putih luar jendela
     light6.position.set(5, 5, 5);
     scene.add(light6);
 
@@ -251,7 +251,7 @@
     };
     camera.position.set(-10, 5, -5);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
+    controls.dampingFactor = 0.1;
 
     scene.matrixAutoUpdate = true;
 
@@ -260,9 +260,9 @@
 
   // main animation loop - calls 50-60 in a second.
   let mainLoop = function () {
-    stats.begin();
+    // stats.begin();
 
-    const elapsedTime = clock.getElapsedTime();
+    // const elapsedTime = clock.getElapsedTime();
 
     // Update controls
     controls.update();
@@ -270,7 +270,7 @@
     // Render
     renderer.render(scene, camera);
 
-    stats.end();
+    // stats.end();
     renderer.render(scene, camera);
     requestAnimationFrame(mainLoop);
   };
