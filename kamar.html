@@ -44,13 +44,14 @@
   let createGeometry = function () {
     const gltfLoader1 = new GLTFLoader();
 
-    //draco untuk mempercepat loader file GLTF
+    // draco untuk mempercepat loader file GLTF
     const draco = new DRACOLoader();
     draco.setDecoderConfig({ type: "js" });
     draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
     gltfLoader1.setDRACOLoader(draco);
+    draco.preload();
 
-    const url1 = "blender/kamar14.gltf";
+    const url1 = "blender/kamar.gltf";
     gltfLoader1.load(url1, (gltf) => {
       gltf.scene.scale.set(0.1, 0.1, 0.1);
       root = gltf.scene;
@@ -71,14 +72,13 @@
         }
       });
 
-      root.loadedModel.animations.forEach((animation) => {
+      root.loadedModel.animations.forEach((animations) => {
         let mixer = new AnimationMixer(this.loadedModel.scene);
         this.mixers.push(mixer);
         let action = mixer.clipAction(animation);
         action.play();
       });
     });
-    // draco.dispose();
   };
 
   // set up the environment -
@@ -260,10 +260,6 @@
 
   // main animation loop - calls 50-60 in a second.
   let mainLoop = function () {
-    // stats.begin();
-
-    // const elapsedTime = clock.getElapsedTime();
-
     // Update controls
     controls.update();
 
