@@ -37,6 +37,8 @@
     geometry,
     controls,
     root,
+    sound,
+    listener,
     mixer;
   var clock = new THREE.Clock();
 
@@ -141,7 +143,6 @@
         scene.background.set(params.lightDisplay);
       });
     display.open();
-
     // 2. create an locate the camera
 
     camera = new THREE.PerspectiveCamera(
@@ -256,6 +257,37 @@
     scene.matrixAutoUpdate = true;
 
     camera.updateProjectionMatrix();
+
+    // create an AudioListener and add it to the camera
+    listener = new THREE.AudioListener();
+    listener.hasPlaybackControl = true;
+
+    camera.add(listener);
+
+    // create a global audio source
+    sound = new THREE.Audio(listener);
+
+    var audioLoader = new THREE.AudioLoader();
+
+    //Load a sound and set it as the Audio object's buffer
+    audioLoader.load(
+      "assets/musik.mp3",
+      function (buffer) {
+        sound.setBuffer(buffer);
+        sound.setLoop(true);
+        sound.setVolume(0.5);
+        sound.play();
+      },
+      // onProgress callback
+      function (xhr) {
+        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+      },
+
+      // onError callback
+      function (err) {
+        console.log("Ada Error");
+      }
+    );
   };
 
   // main animation loop - calls 50-60 in a second.
